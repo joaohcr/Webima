@@ -1,0 +1,125 @@
+	-- Criação das tabelas
+	 
+	-- ####### ENTIDADES #######
+	 
+	CREATE TABLE Utilizador
+	(
+		Id INTEGER NOT NULL IDENTITY (1,1),
+		Nome NVARCHAR(100) NOT NULL,
+		Username NVARCHAR(256) NOT NULL,
+		PRIMARY KEY (Id),
+	);
+	 
+	CREATE TABLE Cliente
+	(
+		Id INTEGER NOT NULL,
+		Data_Nasc DATE NOT NULL,
+		PRIMARY KEY (Id),
+		FOREIGN KEY (Id) REFERENCES Utilizador(Id)
+	);
+	 
+	CREATE TABLE Admin
+	(
+		Id INTEGER NOT NULL,
+		Id_Crt INTEGER NOT NULL,
+		PRIMARY KEY (Id),
+		FOREIGN KEY (Id) REFERENCES Utilizador(Id),
+		FOREIGN KEY (Id_Crt) REFERENCES Admin(Id)
+	);
+	 
+	CREATE TABLE Funcionario
+	(
+		Id INTEGER NOT NULL,
+		Telefone NVARCHAR(9) NOT NULL,
+		Id_Admin INTEGER NOT NULL,
+		PRIMARY KEY (Id),
+		FOREIGN KEY (Id) REFERENCES Utilizador(Id),
+		FOREIGN KEY (Id_Admin) REFERENCES Admin(Id)
+	);
+	 
+	CREATE TABLE Categoria
+	(
+		Id INTEGER NOT NULL IDENTITY(1,1),
+		Nome NVARCHAR(50) NOT NULL UNIQUE,
+		Estado BIT NOT NULL DEFAULT 1,
+		PRIMARY KEY (Id)
+	);
+	 
+	CREATE TABLE Filme
+	(
+		Id INTEGER NOT NULL IDENTITY(1,1),
+		Titulo NVARCHAR(50) NOT NULL,
+		Poster NVARCHAR(50) NOT NULL,
+		Estreia DATE NOT NULL,
+		Sinopse NVARCHAR(MAX) NOT NULL,
+		Realizador NVARCHAR(50) NOT NULL,
+		Elenco NVARCHAR(100) NOT NULL,
+		Ano INTEGER NOT NULL,
+		Duracao INTEGER NOT NULL, -- Em minutos
+		Trailer NVARCHAR(MAX) NOT NULL,
+		Id_Cat INTEGER NOT NULL,
+
+	Id_Func INTEGER NOT NULL,
+		PRIMARY KEY (Id),
+		FOREIGN KEY (Id_Cat) REFERENCES Categoria(Id),
+		FOREIGN KEY (Id_Func) REFERENCES Funcionario(Id)
+	);
+	 
+	CREATE TABLE Sessao
+	(
+		Id INTEGER NOT NULL IDENTITY(1,1),
+		Horas TIME NOT NULL,
+		Estado BIT NOT NULL DEFAULT 1,
+		PRIMARY KEY (Id)
+	);
+	 
+	CREATE TABLE Sala
+	(
+		Id INTEGER NOT NULL IDENTITY(1,1),
+		Nome NVARCHAR(50) NOT NULL,
+		Lotacao INTEGER NOT NULL,
+		Estado BIT NOT NULL DEFAULT 1,
+		PRIMARY KEY (Id)
+	);
+	 
+	-- ENTIdADES ASSOCIATIVAS
+	 
+	CREATE TABLE Bilhete
+	(
+		Id INTEGER NOT NULL IDENTITY(1,1),
+		Id_Filme INTEGER NOT NULL,
+		Id_Sessao INTEGER NOT NULL,
+		Id_Sala INTEGER NOT NULL,
+		Preco MONEY NOT NULL,
+		Data DATE NOT NULL,
+		PRIMARY KEY (Id),
+		FOREIGN KEY (Id_Filme) REFERENCES Filme(Id),
+		FOREIGN KEY (Id_Sessao) REFERENCES Sessao(Id),
+		FOREIGN KEY (Id_Sala) REFERENCES Sala(Id)
+	);
+	 
+	-- ####### RELACIONAMENTOS #######
+	 
+	-- Cliente <> Bilhete
+	 
+	CREATE TABLE Compra
+	(
+		Id_Cliente INTEGER NOT NULL,
+		Id_Bil INTEGER NOT NULL,
+		Data_Compra DATETIME NOT NULL,
+		Num_Bil INTEGER NOT NULL,
+		PRIMARY KEY (Id_Cliente, Id_Bil, Data_Compra),
+		FOREIGN KEY (Id_Cliente) REFERENCES Cliente(Id),
+		FOREIGN KEY (Id_Bil) REFERENCES Bilhete(Id)
+	);
+	 
+	CREATE TABLE Cli_Cat
+	(
+		Id_Cliente INTEGER NOT NULL,
+		Id_Cat INTEGER NOT NULL,
+		PRIMARY KEY (Id_Cliente, Id_Cat),
+		FOREIGN KEY (Id_Cliente) REFERENCES Cliente(Id),
+		FOREIGN KEY (Id_Cat) REFERENCES Categoria(Id) 
+	);
+	 
+	GO
